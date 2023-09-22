@@ -23,5 +23,10 @@ pipeline{
            }
             }
         }
+        stage('maven build'){
+        steps{
+        sh 'mvn package'
+        }
+        }
     }
 }
