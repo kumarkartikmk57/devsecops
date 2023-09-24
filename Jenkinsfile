@@ -52,9 +52,31 @@ pipeline{
             }
         }
     }
+//    stage('pit mutation stage'){
+//        steps{
+//            sh 'mvn org.pitest:pitest-maven:mutationCoverage'
+//        pitmutationStatsFile: 'target/pit-reports/**/mutations.xml'
+//    }}
     stage('Docker build'){
         steps{
-            sh 'docker build -t jenjen:$BUILD_ID .'
+            sh 'docker build -t kumarkartikmk57/jenjen:$BUILD_ID .'
+        }
+    }
+    stage('Docker push'){
+        steps{
+            sh 'docker push kumarkartikmk57/jenjen:$BUILD_ID'
+        }
+    }
+    stage('removing older builds'){
+        steps{
+            sh 'sh /home/kartik/docrm.sh'
+        }
+    }
+    stage('kubernetes deployment'){
+        steps{
+            withKubeConfig([credentialsId: '554b9064-5a65-44a7-9479-1979bbb60bb0']) {
+              sh 'minikube kubectl set image deployment/myapp jenkins=kumarkartikmk57/jenjen:$BUILD_ID'
+           }
         }
     }
 }
